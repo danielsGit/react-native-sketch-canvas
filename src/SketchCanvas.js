@@ -155,20 +155,21 @@ class SketchCanvas extends React.Component {
   componentWillMount() {
     this.panResponder = PanResponder.create({
       // Ask to be the responder:
-      onStartShouldSetPanResponder: (evt, gestureState) => true,
-      onStartShouldSetPanResponderCapture: (evt, gestureState) => true,
-      onMoveShouldSetPanResponder: (evt, gestureState) => true,
-      onMoveShouldSetPanResponderCapture: (evt, gestureState) => true,
+      onStartShouldSetPanResponder: (evt, gestureState) => this.props.touchEnabled && gestureState.numberActiveTouches === 1,
+      onStartShouldSetPanResponderCapture: (evt, gestureState) => this.props.touchEnabled && gestureState.numberActiveTouches === 1,
+      onMoveShouldSetPanResponder: (evt, gestureState) => this.props.touchEnabled && gestureState.numberActiveTouches === 1,
+      onMoveShouldSetPanResponderCapture: (evt, gestureState) => this.props.touchEnabled && gestureState.numberActiveTouches === 1,
 
       onPanResponderGrant: (evt, gestureState) => {
         if (!this.props.touchEnabled) return
+        if (gestureState.numberActiveTouches > 1) return;
         const e = evt.nativeEvent
         this._offset = { x: e.pageX - e.locationX, y: e.pageY - e.locationY }
         this._path = {
           id: parseInt(Math.random() * 100000000), color: this.props.strokeColor,
           width: this.props.strokeWidth, data: []
         }
-        
+
         UIManager.dispatchViewManagerCommand(
           this._handle,
           UIManager.getViewManagerConfig('RNSketchCanvas').Commands.newPath,
@@ -191,7 +192,8 @@ class SketchCanvas extends React.Component {
         this.props.onStrokeStart(x, y)
       },
       onPanResponderMove: (evt, gestureState) => {
-        if (!this.props.touchEnabled) return
+        if (!this.props.touchEnabled) return;
+        if (gestureState.numberActiveTouches > 1) return;
         if (this._path) {
           UIManager.dispatchViewManagerCommand(this._handle, UIManager.getViewManagerConfig('RNSketchCanvas').Commands.addPoint, [
             parseFloat((gestureState.moveX - this._offset.x).toFixed(2) * this._screenScale),
@@ -204,6 +206,7 @@ class SketchCanvas extends React.Component {
       },
       onPanResponderRelease: (evt, gestureState) => {
         if (!this.props.touchEnabled) return
+        if (gestureState.numberActiveTouches > 1) return;
         if (this._path) {
           this.props.onStrokeEnd({ path: this._path, size: this._size, drawer: this.props.user })
           this._paths.push({ path: this._path, size: this._size, drawer: this.props.user })
