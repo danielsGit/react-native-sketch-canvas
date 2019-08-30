@@ -152,6 +152,15 @@ class SketchCanvas extends React.Component {
     }
   }
 
+  finishDrawing() {
+    if (!this.props.touchEnabled) return
+    if (this._path) {
+      this.props.onStrokeEnd({ path: this._path, size: this._size, drawer: this.props.user })
+      this._paths.push({ path: this._path, size: this._size, drawer: this.props.user })
+    }
+    UIManager.dispatchViewManagerCommand(this._handle, UIManager.getViewManagerConfig('RNSketchCanvas').Commands.endPath, [])
+  }
+
   componentWillMount() {
     this.panResponder = PanResponder.create({
       // Ask to be the responder:

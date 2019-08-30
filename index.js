@@ -142,6 +142,10 @@ export default class RNSketchCanvas extends React.Component {
     return this._sketchCanvas.undo()
   }
 
+  finishDrawing() {
+    return this._sketchCanvas.finishDrawing()
+  }
+  
   addPath(data) {
     this._sketchCanvas.addPath(data)
   }
@@ -156,7 +160,7 @@ export default class RNSketchCanvas extends React.Component {
       this._sketchCanvas.save(p.imageType, p.transparent, p.folder ? p.folder : '', p.filename, p.includeImage !== false, p.includeText !== false, p.cropToImageSize || false)
     } else {
       const date = new Date()
-      this._sketchCanvas.save('png', false, '', 
+      this._sketchCanvas.save('png', false, '',
         date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + ('0' + date.getDate()).slice(-2) + ' ' + ('0' + date.getHours()).slice(-2) + '-' + ('0' + date.getMinutes()).slice(-2) + '-' + ('0' + date.getSeconds()).slice(-2),
         true, true, false)
     }
