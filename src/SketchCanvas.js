@@ -237,6 +237,7 @@ class SketchCanvas extends React.Component {
   }
 
   render() {
+    const { onLayout } = this.props;
     return (
       <RNSketchCanvas
         ref={ref => {
@@ -247,6 +248,9 @@ class SketchCanvas extends React.Component {
           this._size = { width: e.nativeEvent.layout.width, height: e.nativeEvent.layout.height }
           this._initialized = true
           this._pathsToProcess.length > 0 && this._pathsToProcess.forEach(p => this.addPath(p))
+          if (onLayout) {
+            onLayout(e)
+          }
         }}
         {...this.panResponder.panHandlers}
         onChange={(e) => {
