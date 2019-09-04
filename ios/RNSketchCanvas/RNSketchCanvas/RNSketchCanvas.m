@@ -365,21 +365,25 @@
     }
 }
 
+- (NSString *) getDocumentDir {
+    return [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) firstObject];
+}
+
 - (void)saveImageOfType:(NSString*) type folder:(NSString*) folder filename:(NSString*) filename withTransparentBackground:(BOOL) transparent includeImage:(BOOL)includeImage includeText:(BOOL)includeText cropToImageSize:(BOOL)cropToImageSize {
     UIImage *img = [self createImageWithTransparentBackground:transparent includeImage:includeImage includeText:(BOOL)includeText cropToImageSize:cropToImageSize];
     
     if (folder != nil && filename != nil) {
-        NSURL *tempDir = [[NSURL fileURLWithPath:NSTemporaryDirectory() isDirectory:YES] URLByAppendingPathComponent: folder];
+        NSURL *docDir = [[NSURL fileURLWithPath:[self getDocumentDir] isDirectory:YES] URLByAppendingPathComponent: folder];
         NSError * error = nil;
-        [[NSFileManager defaultManager] createDirectoryAtPath:[tempDir path]
+        [[NSFileManager defaultManager] createDirectoryAtPath:[docDir path]
                                   withIntermediateDirectories:YES
                                                    attributes:nil
                                                         error:&error];
         if (error == nil) {
-            NSURL *fileURL = [[tempDir URLByAppendingPathComponent: filename] URLByAppendingPathExtension: type];
+            NSURL *fileURL = [[docDir URLByAppendingPathComponent: filename] URLByAppendingPathExtension: type];
             NSData *imageData = [self getImageData:img type:type];
             [imageData writeToURL:fileURL atomically:YES];
-
+            
             if (_onChange) {
                 _onChange(@{ @"success": @YES, @"path": [fileURL path]});
             }
@@ -395,6 +399,7 @@
         UIImageWriteToSavedPhotosAlbum(img, self, @selector(image:didFinishSavingWithError:contextInfo:), nil);
     }
 }
+
 
 - (UIImage *)scaleImage:(UIImage *)originalImage toSize:(CGSize)size contentMode: (NSString*)mode
 {
