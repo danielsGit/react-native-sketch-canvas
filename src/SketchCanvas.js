@@ -132,6 +132,7 @@ class SketchCanvas extends React.Component {
   }
 
   deletePath(id) {
+    this._path = null
     this._paths = this._paths.filter(p => p.path.id !== id)
     UIManager.dispatchViewManagerCommand(this._handle, UIManager.getViewManagerConfig('RNSketchCanvas').Commands.deletePath, [id])
   }
